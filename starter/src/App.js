@@ -3,6 +3,7 @@ import { useState , useEffect } from "react";
 import { Routes , Route } from "react-router-dom"
 import Search from "./components/Search";
 import Home from "./components/Home";
+import NotFound from "./components/NotFound";
 import *as BooksAPI from "./BooksAPI";
 function App() {
   // Start states
@@ -16,14 +17,17 @@ function App() {
   useEffect(()=>{
     getBooks();
   },[])
-  const updateBookShelf = async (book , shelf) =>{
-    await BooksAPI.update(book , shelf);
-    getBooks()
+  const updateBookShelf = (book , shelf) =>{
+    BooksAPI.update(book , shelf).then(()=>{
+      book.shelf = shelf;
+      setBooks(books.filter((bk) => bk.id !== book.id).concat(book));
+    });
   }
   // End functions
   return (
     <div className="app">
       <Routes>
+        <Route path="*" element = {<NotFound />}/>
         <Route 
           exact 
           path="/" 
